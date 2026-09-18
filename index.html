@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprawdzian: Zaczynamy przygodę z matematyką</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22 font-size=%2280%22><text y=%2280%22>%F0%9F%93%9D</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#eef2ff; --bg2:#e0f2fe; --primary:#4f46e5; --primary-dark:#4338ca;
+    --good:#16a34a; --bad:#dc2626; --text:#1e293b; --card-bg:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;min-height:100vh;
+    font-family:'Quicksand','Trebuchet MS',-apple-system,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    color:var(--text);padding:16px;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+  header{text-align:center;margin-bottom:20px;}
+  h1{font-size:1.7rem;margin:0 0 4px;}
+  .subtitle{margin:0;color:#475569;}
+  .card{background:var(--card-bg);border-radius:24px;padding:24px;box-shadow:0 10px 30px rgba(79,70,229,0.12);text-align:center;}
+  .primary-btn{background:var(--primary);color:#fff;border:none;border-radius:14px;padding:14px 28px;font-size:1.1rem;font-weight:700;cursor:pointer;margin-top:16px;font-family:inherit;transition:transform .15s, background .15s;}
+  .primary-btn:hover{background:var(--primary-dark);transform:translateY(-2px);}
+  .primary-btn:disabled{opacity:.5;cursor:default;transform:none;}
+  .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .progress-bar{flex:1;height:10px;background:#e2e8f0;border-radius:6px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--primary);transition:width .3s;width:0;}
+  #progress-text{font-size:.85rem;color:#64748b;white-space:nowrap;}
+  .score-row{text-align:right;font-weight:700;color:var(--primary);margin-bottom:4px;}
+  .q-number{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--primary);background:#eef2ff;border-radius:8px;padding:3px 12px;margin-bottom:10px;}
+  .q-instruction{font-size:1.08rem;font-weight:700;margin:8px 0;text-align:left;}
+  .q-context{font-size:.95rem;color:#475569;margin:6px 0 14px;text-align:left;background:#f8fafc;border-left:4px solid #cbd5e1;padding:10px 14px;border-radius:8px;}
+  .clock-big{margin:10px auto;}
+  .clock-svg{width:100%;max-width:180px;height:auto;display:block;margin:0 auto;}
+  .options{display:grid;gap:10px;margin-top:16px;grid-template-columns:repeat(2,1fr);}
+  @media (max-width:420px){ .options{grid-template-columns:1fr;} }
+  .opt-btn{border:2px solid #cbd5e1;background:#f8fafc;border-radius:14px;padding:12px;font-size:1.02rem;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text);transition:all .15s;}
+  .opt-btn:hover:not(:disabled){border-color:var(--primary);}
+  .opt-btn:disabled{cursor:default;}
+  .opt-btn.correct{border-color:var(--good);background:#dcfce7;color:#166534;}
+  .opt-btn.wrong{border-color:var(--bad);background:#fee2e2;color:#991b1b;}
+  .input-row{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:10px;flex-wrap:wrap;}
+  #inputD{width:140px;padding:10px;font-size:1.15rem;border:2px solid #cbd5e1;border-radius:12px;text-align:center;font-family:inherit;}
+  #inputD.correct{border-color:var(--good);background:#dcfce7;}
+  #inputD.wrong{border-color:var(--bad);background:#fee2e2;}
+  .check-btn{background:var(--primary);color:#fff;border:none;border-radius:12px;padding:10px 20px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .check-btn:disabled{opacity:.6;cursor:default;}
+  .feedback{min-height:28px;margin-top:14px;font-weight:700;font-size:1.02rem;}
+  .feedback-good{color:var(--good);}
+  .feedback-bad{color:var(--bad);}
+  .hint-box{margin-top:10px;padding:10px 14px;background:#fef9c3;border:1px solid #fde68a;border-radius:12px;font-size:.92rem;font-weight:500;color:#78350f;text-align:left;line-height:1.4;}
+  .hint-box strong{color:#78350f;}
+  footer{text-align:center;margin-top:20px;color:#94a3b8;font-size:.85rem;}
+  h2{margin-top:0;color:var(--primary);}
+  .info-box{background:#eef2ff;border-radius:14px;padding:12px 16px;margin:10px 0 16px;text-align:left;font-size:.95rem;line-height:1.5;}
+  .info-box b{color:var(--primary-dark);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>📝 Sprawdzian z działu</h1>
+    <p class="subtitle">Zaczynamy przygodę z matematyką — zegary, kalendarz, cyfry rzymskie, długości</p>
+  </header>
+
+  <section id="start-screen" class="card">
+    <p>To jest sprawdzian oparty na zadaniach powtórzeniowych z podręcznika (rozdział „Zaczynamy przygodę z matematyką"). Czeka na Ciebie 20 pytań, w tym prawdziwe zadania tekstowe. Powodzenia!</p>
+    <button id="start-btn" class="primary-btn">Rozpocznij sprawdzian</button>
+  </section>
+
+  <section id="quiz-screen" class="card" hidden>
+    <div class="progress-row">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <span id="progress-text"></span>
+    </div>
+    <div class="score-row">Wynik: <span id="score-text">0</span>/<span id="score-total">0</span></div>
+    <div class="q-number" id="q-number"></div>
+    <div id="question-area"></div>
+    <div class="feedback" id="feedback"></div>
+    <button id="next-btn" class="primary-btn" hidden>Dalej ▶</button>
+  </section>
+
+  <section id="result-screen" class="card" hidden>
+    <h2 id="result-title"></h2>
+    <p id="result-desc"></p>
+    <button id="restart-btn" class="primary-btn">Zagraj ponownie</button>
+  </section>
+
+  <footer>
+    <p>Na podstawie zadań powtórzeniowych z podręcznika — dział „Zaczynamy przygodę z matematyką".</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function fmt(h,m){ return pad2(h)+':'+pad2(m); }
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function polar(cx,cy,r,angleDeg){
+  const rad = angleDeg*Math.PI/180;
+  return { x: cx + r*Math.sin(rad), y: cy - r*Math.cos(rad) };
+}
+function clockFaceSVG(hour24,minute,size){
+  size = size || 170;
+  const cx=size/2, cy=size/2, r=size/2-8;
+  const hour12 = hour24 % 12;
+  const minuteAngle = minute*6;
+  const hourAngle = (hour12 + minute/60)*30;
+  let ticks='';
+  for(let i=0;i<60;i+=5){
+    const big = i%15===0;
+    const p1=polar(cx,cy,r-2,i*6);
+    const p2=polar(cx,cy, big? r-14 : r-8, i*6);
+    ticks+=`<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="#334155" stroke-width="${big?3:1.5}" stroke-linecap="round"/>`;
+  }
+  let numbers='';
+  for(let n=1;n<=12;n++){
+    const p = polar(cx,cy,r-26,n*30);
+    numbers+=`<text x="${p.x.toFixed(1)}" y="${(p.y+5).toFixed(1)}" font-size="${(size*0.11).toFixed(1)}" text-anchor="middle" fill="#1e293b" font-weight="700">${n}</text>`;
+  }
+  const hourHandLen = r*0.5;
+  const minuteHandLen = r*0.78;
+  const hourHand = `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${(cy-hourHandLen).toFixed(1)}" stroke="#1e293b" stroke-width="6" stroke-linecap="round" transform="rotate(${hourAngle.toFixed(2)} ${cx} ${cy})"/>`;
+  const minuteHand = `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${(cy-minuteHandLen).toFixed(1)}" stroke="#2563eb" stroke-width="4" stroke-linecap="round" transform="rotate(${minuteAngle.toFixed(2)} ${cx} ${cy})"/>`;
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" class="clock-svg">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="#334155" stroke-width="4"/>
+    ${ticks}${numbers}${hourHand}${minuteHand}
+    <circle cx="${cx}" cy="${cy}" r="7" fill="#1e293b"/>
+  </svg>`;
+}
+
+function lockOptions(wrap){ [...wrap.children].forEach(b=>b.disabled=true); }
+function markOption(btn,isCorrect){ btn.classList.add(isCorrect?'correct':'wrong'); }
+function markCorrectByValue(wrap){
+  const b=[...wrap.children].find(x=>x.dataset.correct==='true');
+  if(b) b.classList.add('correct');
+}
+function renderTextOptions(container, options, onAnswer){
+  const wrapId = 'opts-'+Math.random().toString(36).slice(2);
+  container.innerHTML += `<div class="options" id="${wrapId}"></div>`;
+  const wrap = container.querySelector('#'+wrapId);
+  options.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn'; btn.textContent=opt.text; btn.dataset.correct=opt.correct;
+    btn.onclick=()=>{ lockOptions(wrap); markOption(btn,opt.correct); if(!opt.correct) markCorrectByValue(wrap); onAnswer(opt.correct); };
+    wrap.appendChild(btn);
+  });
+}
+function renderTextInput(container, correctText, onAnswer, placeholder){
+  container.innerHTML += `<div class="input-row">
+    <input type="text" id="inputD" placeholder="${placeholder||'odpowiedź'}" autocomplete="off" />
+    <button class="check-btn" id="checkD">Sprawdź</button>
+  </div>`;
+  const input = container.querySelector('#inputD');
+  const btn = container.querySelector('#checkD');
+  const normalize = s => s.trim().toLowerCase().replace(/\s+/g,'');
+  const submit=()=>{
+    if(input.disabled) return;
+    const isCorrect = normalize(input.value) === normalize(correctText);
+    input.disabled=true; btn.disabled=true;
+    input.classList.add(isCorrect?'correct':'wrong');
+    onAnswer(isCorrect);
+  };
+  btn.onclick=submit;
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+  input.focus();
+}
+
+/* =========================================================
+   ZADANIA POWTÓRZENIOWE (na podstawie podręcznika, str. 45-46)
+   ========================================================= */
+const Q = [];
+
+// 1. Zegar (5:55 = za pięć szósta)
+Q.push({
+  num:'Zadanie 1',
+  hint:'Wskazówka godzinowa jest tuż przed 6, a minutowa wskazuje 11 (czyli 55 minut) — to znaczy, że brakuje 5 minut do pełnej godziny. Jest więc "za pięć szósta".',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Którą z podanych godzin wskazuje zegar obok?</p>
+      <div class="clock-big">${clockFaceSVG(17,55,170)}</div>`;
+    renderTextOptions(container, shuffle([
+      {text:'za pięć piąta', correct:false},
+      {text:'za jedenaście piąta', correct:false},
+      {text:'za pięć szósta', correct:true},
+      {text:'za jedenaście szósta', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 2. Zegar cyfrowy wieczorem
+Q.push({
+  num:'Zadanie 2',
+  hint:'Jest wieczór, więc do godziny sprzed południa dodajemy 12: 5 + 12 = 17. Zegar cyfrowy pokaże więc 17:55.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Jest wieczór. Jak wyświetli się na zegarze cyfrowym godzina, którą wskazywał zegar z zadania 1 (za pięć szósta)?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'15:55', correct:false},{text:'16:55', correct:false},
+      {text:'17:55', correct:true},{text:'18:55', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 3. Wycieczka 20-25 sierpnia
+Q.push({
+  num:'Zadanie 3',
+  hint:'Policz dni od 20 do 25 sierpnia włącznie: 20, 21, 22, 23, 24, 25 — to 6 dni (wycieczka trwała od rana pierwszego dnia do wieczora ostatniego).',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Wycieczka zaczęła się 20 sierpnia rano, a skończyła 25 sierpnia wieczorem. Ile dni trwała ta wycieczka?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'4 dni', correct:false},{text:'5 dni', correct:false},
+      {text:'6 dni', correct:true},{text:'7 dni', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 4. Marta urodziny poniedziałek 8 maja
+Q.push({
+  num:'Zadanie 4',
+  hint:'Wypisz dni od poniedziałku 8 maja: poniedziałek 8, wtorek 9, środa 10, czwartek 11, piątek 12, sobota 13. Najbliższa sobota po 8 maja to 13 maja.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Marta miała urodziny w poniedziałek 8 maja. Gości zaprosiła na najbliższą sobotę po tym dniu. Na który dzień Marta zaprosiła gości?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'na 12 maja', correct:false},{text:'na 13 maja', correct:true},
+      {text:'na 14 maja', correct:false},{text:'na 15 maja', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 5. XXIX na arabskie
+Q.push({
+  num:'Zadanie 5',
+  hint:'XXIX to XX (20) + IX (9) = 29.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Jak zapisać liczbę XXIX cyframi arabskimi?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'24', correct:false},{text:'26', correct:false},
+      {text:'29', correct:true},{text:'31', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 6. Co jest 1 IX
+Q.push({
+  num:'Zadanie 6',
+  hint:'1 IX to 1 września — w Polsce to dzień, w którym zaczyna się rok szkolny.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Co jest 1 IX?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'Nowy Rok', correct:false},{text:'początek wakacji', correct:false},
+      {text:'początek roku szkolnego', correct:true},{text:'Święto Niepodległości', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 7. Uniwersytet Jagielloński 1364
+Q.push({
+  num:'Zadanie 7',
+  hint:'XIV wiek obejmuje lata od 1301 do 1400, a rok 1364 mieści się w tym przedziale.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">W 1364 roku powstał najstarszy uniwersytet w Polsce – Uniwersytet Jagielloński. Który to był wiek?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'XIII', correct:false},{text:'XIV', correct:true},
+      {text:'XV', correct:false},{text:'XVI', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 8. Wieżowiec 10-piętrowy
+Q.push({
+  num:'Zadanie 8',
+  hint:'Jedno piętro ma zwykle około 3 metrów wysokości, więc budynek z 10 piętrami (plus parter) może mieć około 35 metrów. 35 cm to za mało (to wysokość np. stołka), a 90-95 m to wysokość dużo wyższego wieżowca.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Janek mieszka w 10-piętrowym wieżowcu. Jaką wysokość może mieć taki budynek?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'35 cm', correct:false},{text:'90 m', correct:false},
+      {text:'35 m', correct:true},{text:'95 m', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 9. Odległość między miejscowościami w Polsce
+Q.push({
+  num:'Zadanie 9',
+  hint:'Polska rozciąga się na kilkaset kilometrów (ok. 650-700 km), więc odpowiedź musi być rzędu setek kilometrów — 800 m czy 8 km to odległości w obrębie jednej miejscowości, a 80 km to odległość między sąsiednimi miastami.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Ile wynosi odległość między najbardziej oddalonymi od siebie miejscowościami w Polsce?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'800 m', correct:false},{text:'8 km', correct:false},
+      {text:'80 km', correct:false},{text:'800 km', correct:true}
+    ]), onAnswer);
+  }
+});
+
+// 10. Zegar wieczorem -> zapis cyfrowy (7:05 -> 19:05)
+Q.push({
+  num:'Zadanie 10',
+  hint:'Wskazówka godzinowa jest tuż po 7, a minutowa wskazuje 5 minut. Jest wieczór, więc dodajemy 12: 7 + 12 = 19. Zegar cyfrowy pokazałby 19:05.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Jest wieczór. Spójrz na zegar obok. Zapisz wskazaną przez niego godzinę tak, jak wyświetliłby ją zegar cyfrowy (format GG:MM).</p>
+      <div class="clock-big">${clockFaceSVG(19,5,170)}</div>`;
+    renderTextInput(container, '19:05', onAnswer, 'np. 19:05');
+  }
+});
+
+// 11. Michalina czeka na autobus (19:15 -> 19:50)
+Q.push({
+  num:'Zadanie 11',
+  hint:'Michalina dotarła na przystanek o 19:15, a autobus przyjedzie o 19:50. Podziel obliczenia na etapy: od 19:15 do 19:30 mija 15 minut, a od 19:30 do 19:50 mija 20 minut. Razem: 15 + 20 = 35 minut.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Zegar na rysunku obok wskazuje godzinę, o której Michalina dotarła wieczorem na przystanek. Jej autobus przyjedzie o 19:50. Ile minut Michalina będzie czekać na ten autobus?</p>
+      <div class="clock-big">${clockFaceSVG(19,15,170)}</div>`;
+    renderTextInput(container, '35', onAnswer, 'liczba minut');
+  }
+});
+
+// 12. Trening judo
+Q.push({
+  num:'Zadanie 12',
+  hint:'Trening zaczyna się o 18:00, a trzeba przyjść 15 minut wcześniej: 18:00 − 15 min = 17:45. Dojście zajmuje 20 minut, więc z domu trzeba wyjść o 17:45 − 20 min = 17:25.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Wiktor chodzi na treningi judo piechotą. Zajmuje mu to 20 minut. O której godzinie Wiktor musi wychodzić z domu?</p>
+      <div class="info-box"><b>TRENING JUDO DLA KLAS 4 i 5</b><br>Każdy wtorek, godz. 18:00<br>Przychodzimy 15 minut wcześniej, żeby się przebrać.<br>Pamiętajcie o zabraniu wody.</div>`;
+    renderTextInput(container, '17:25', onAnswer, 'np. 17:25');
+  }
+});
+
+// 13a-c. Dopasuj określenie do godziny
+const RAMKA_13 = ['za pięć dziewiątą','za pięć dziesiątą','wpół do dziewiątej','pięć po dziewiątej','wpół do dziesiątej'];
+function make13(letter, timeText, correctPhrase, hintText){
+  Q.push({
+    num:`Zadanie 13${letter}`,
+    hint:hintText,
+    render(container,onAnswer){
+      container.innerHTML = `<p class="q-instruction">Dopasuj określenie z ramki do podanej godziny: <strong>${timeText}</strong></p>
+        <p class="q-context">Do wyboru: ${RAMKA_13.join(' • ')}</p>`;
+      renderTextOptions(container, shuffle(RAMKA_13.map(p=>({text:p, correct:p===correctPhrase}))), onAnswer);
+    }
+  });
+}
+make13('a','9:05','pięć po dziewiątej','9:05 to 5 minut po pełnej godzinie 9, czyli "pięć po dziewiątej".');
+make13('b','9:30','wpół do dziesiątej','9:30 to dokładnie w połowie drogi do godziny 10, czyli "wpół do dziesiątej".');
+make13('c','9:55','za pięć dziesiątą','9:55 to 5 minut przed pełną godziną 10, czyli "za pięć dziesiątą".');
+
+// 14. 1 grudnia sobota -> 1 stycznia
+Q.push({
+  num:'Zadanie 14',
+  hint:'Grudzień ma 31 dni. 31 podzielone przez 7 daje 4 reszty 3 (4×7=28, 31-28=3). Dzień tygodnia przesuwa się więc o 3 do przodu: sobota + 3 dni = wtorek.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">W pewnym roku 1 grudnia był w sobotę. W jakim dniu tygodnia będzie 1 stycznia następnego roku?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'poniedziałek', correct:false},{text:'wtorek', correct:true},
+      {text:'środa', correct:false},{text:'niedziela', correct:false}
+    ]), onAnswer);
+  }
+});
+
+// 15. Cena oliwy po obniżce (XX - VI)
+Q.push({
+  num:'Zadanie 15',
+  hint:'Zamień na liczby arabskie: XX = 20, VI = 6. Odejmij: 20 − 6 = 14. Zapisz wynik cyframi rzymskimi: 14 = XIV.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Spójrz na rozmowę sprzedawcy z klientem. Jaka będzie cena oliwy po obniżce? Zapisz tę cenę cyframi rzymskimi.</p>
+      <div class="info-box">— Oliwa jest po <b>XX</b> asów, ale dla ciebie o <b>VI</b> asów taniej.</div>`;
+    renderTextInput(container, 'XIV', onAnswer, 'cyframi rzymskimi');
+  }
+});
+
+// 16a. XXIV + VI
+Q.push({
+  num:'Zadanie 16a',
+  hint:'Zamień na liczby arabskie: XXIV = 24, VI = 6. Dodaj: 24 + 6 = 30. Zapisz wynik cyframi rzymskimi: 30 = XXX.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Wykonaj działanie. Zapisz wynik za pomocą cyfr rzymskich:</p><p class="q-context" style="text-align:center;font-size:1.2rem;font-weight:700;">XXIV + VI</p>`;
+    renderTextInput(container, 'XXX', onAnswer, 'cyframi rzymskimi');
+  }
+});
+
+// 16b. XVIII - III
+Q.push({
+  num:'Zadanie 16b',
+  hint:'Zamień na liczby arabskie: XVIII = 18, III = 3. Odejmij: 18 − 3 = 15. Zapisz wynik cyframi rzymskimi: 15 = XV.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Wykonaj działanie. Zapisz wynik za pomocą cyfr rzymskich:</p><p class="q-context" style="text-align:center;font-size:1.2rem;font-weight:700;">XVIII − III</p>`;
+    renderTextInput(container, 'XV', onAnswer, 'cyframi rzymskimi');
+  }
+});
+
+// 17. Jednostka długości sali gimnastycznej
+Q.push({
+  num:'Zadanie 17',
+  hint:'Sala gimnastyczna ma zwykle długość rzędu kilkunastu metrów — 15 milimetrów to mniej niż 2 centymetry (za mało), a 15 centymetrów to długość ołówka (też za mało). Odpowiednia jednostka to metry.',
+  render(container,onAnswer){
+    container.innerHTML = `<p class="q-instruction">Ania zapisała, że długość sali gimnastycznej to 15, ale zapomniała podać jednostkę. Jaka to była jednostka?</p>`;
+    renderTextOptions(container, shuffle([
+      {text:'milimetry', correct:false},{text:'centymetry', correct:false},{text:'metry', correct:true}
+    ]), onAnswer);
+  }
+});
+
+/* =========================================================
+   APP CONTROLLER
+   ========================================================= */
+const startScreen = document.getElementById('start-screen');
+const quizScreen = document.getElementById('quiz-screen');
+const resultScreen = document.getElementById('result-screen');
+const questionArea = document.getElementById('question-area');
+const feedback = document.getElementById('feedback');
+const nextBtn = document.getElementById('next-btn');
+const progressFill = document.getElementById('progress-fill');
+const progressText = document.getElementById('progress-text');
+const scoreText = document.getElementById('score-text');
+const scoreTotal = document.getElementById('score-total');
+const qNumber = document.getElementById('q-number');
+const resultTitle = document.getElementById('result-title');
+const resultDesc = document.getElementById('result-desc');
+
+const PRAISE = ['Świetnie! ✅','Brawo! 🎉','Dokładnie tak! 👍','Super! ⭐','Tak jest! 🙌'];
+
+const state = { index:0, score:0 };
+
+function startQuiz(){
+  state.index = 0;
+  state.score = 0;
+  startScreen.hidden = true;
+  resultScreen.hidden = true;
+  quizScreen.hidden = false;
+  scoreTotal.textContent = Q.length;
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = Q[state.index];
+  progressFill.style.width = (state.index/Q.length*100)+'%';
+  progressText.textContent = `Pytanie ${state.index+1} z ${Q.length}`;
+  scoreText.textContent = state.score;
+  qNumber.textContent = q.num;
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  nextBtn.hidden = true;
+  questionArea.innerHTML = '';
+  q.render(questionArea, (isCorrect)=>handleAnswer(isCorrect, q.hint));
+}
+
+function handleAnswer(isCorrect, hint){
+  if(isCorrect){
+    state.score++;
+    scoreText.textContent = state.score;
+    feedback.innerHTML = PRAISE[Math.floor(Math.random()*PRAISE.length)];
+    feedback.className = 'feedback feedback-good';
+  } else {
+    const hintHTML = hint ? `<div class="hint-box">💡 <strong>Wyjaśnienie:</strong> ${hint}</div>` : '';
+    feedback.innerHTML = `Niepoprawnie.${hintHTML}`;
+    feedback.className = 'feedback feedback-bad';
+  }
+  nextBtn.hidden = false;
+}
+
+function goNext(){
+  state.index++;
+  if(state.index >= Q.length){
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResults(){
+  quizScreen.hidden = true;
+  resultScreen.hidden = false;
+  const total = Q.length;
+  resultTitle.textContent = `Wynik: ${state.score} / ${total}`;
+  let desc;
+  if(state.score===total) desc='Perfekcyjnie! Znasz ten dział na wylot! 🏆';
+  else if(state.score>=total*0.7) desc='Świetna robota! 👏';
+  else if(state.score>=total*0.4) desc='Dobrze, jeszcze trochę ćwiczeń i będzie super! 💪';
+  else desc='Ćwicz dalej — na pewno Ci pójdzie coraz lepiej! 📚';
+  resultDesc.textContent = desc;
+}
+
+document.getElementById('start-btn').onclick = startQuiz;
+document.getElementById('restart-btn').onclick = startQuiz;
+nextBtn.onclick = goNext;
+</script>
+</body>
+</html>
