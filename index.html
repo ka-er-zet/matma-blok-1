@@ -390,15 +390,20 @@ function genQ8(){
   const person = choice(NAMES);
   const floors = randInt(3,20);
   const base = Math.round(floors*3.5);
+  // Distractors scale WITH the base (not a fixed +N), so the "clearly too
+  // tall" cue stays equally obvious for a 3-floor and a 20-floor building,
+  // and the two wrong "m" options stay clearly apart from each other too.
+  const d1 = Math.round(base*2/5)*5;
+  const d2 = Math.round(base*2.6/5)*5;
   const options = shuffle([
     {text:base+' cm', correct:false},
     {text:base+' m', correct:true},
-    {text:(base+55)+' m', correct:false},
-    {text:(base+60)+' m', correct:false},
+    {text:d1+' m', correct:false},
+    {text:d2+' m', correct:false},
   ]);
   return {
     num:'Zadanie 8',
-    hint:`Jedno piętro ma zwykle około 3,5 metra wysokości, więc budynek z ${floors} piętrami może mieć w przybliżeniu ${floors}×3,5 ≈ ${base} metrów. ${base} cm to za mało (to wysokość np. stołka), a ${base+55}-${base+60} m to wysokość dużo wyższego wieżowca.`,
+    hint:`Jedno piętro ma zwykle około 3,5 metra wysokości, więc budynek z ${floors} piętrami może mieć w przybliżeniu ${floors}×3,5 ≈ ${base} metrów. ${base} cm to za mało (to wysokość np. stołka), a ${d1}-${d2} m to wysokość dużo wyższego wieżowca — ponad dwa razy wyższego niż ten z ${floors} pięter.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${person.n} mieszka w ${floors}-piętrowym wieżowcu. Jaką wysokość może mieć taki budynek?</p>`;
       renderTextOptions(container, options, onAnswer);
