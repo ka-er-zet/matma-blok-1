@@ -59,6 +59,17 @@
   h2{margin-top:0;color:var(--primary);}
   .info-box{background:#eef2ff;border-radius:14px;padding:12px 16px;margin:10px 0 16px;text-align:left;font-size:.95rem;line-height:1.5;}
   .info-box b{color:var(--primary-dark);}
+  #result-breakdown{text-align:left;margin-top:8px;}
+  #result-breakdown h3{font-size:.95rem;color:var(--primary-dark);margin:18px 0 8px;}
+  .topic-row{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;background:#f8fafc;border-radius:10px;margin-bottom:6px;font-size:.92rem;}
+  .topic-row b{color:var(--bad);}
+  .miss-details{margin-top:12px;font-size:.9rem;}
+  .miss-details summary{cursor:pointer;font-weight:700;color:var(--primary);}
+  .miss-item{padding:10px 0;border-bottom:1px solid #f1f5f9;}
+  .miss-item:last-child{border-bottom:none;}
+  .miss-topic{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--primary);background:#eef2ff;border-radius:6px;padding:2px 8px;margin-right:6px;vertical-align:middle;}
+  .miss-q{font-weight:600;line-height:1.4;}
+  .miss-hint{color:#78350f;background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:.85rem;line-height:1.4;}
 </style>
 </head>
 <body>
@@ -89,6 +100,7 @@
   <section id="result-screen" class="card" hidden>
     <h2 id="result-title"></h2>
     <p id="result-desc"></p>
+    <div id="result-breakdown"></div>
     <button id="restart-btn" class="primary-btn">Zagraj ponownie</button>
   </section>
 
@@ -264,7 +276,7 @@ function genQ1(){
     {text:`za ${CARD[dial]} ${NOM[next]}`, correct:false},
   ]);
   return {
-    num:'Zadanie 1',
+    num:'Zadanie 1', topic:'Zegary',
     hint:`Wskazówka minutowa wskazuje na tarczy liczbę ${dial} — to pułapka! Liczy się, ile minut BRAKUJE do pełnej godziny: 60 − ${minute} = ${remaining}. Wskazówka godzinowa jest tuż przed godziną ${next} (czyli zaraz skończy się godzina ${cur} i zacznie ${next}). Dlatego poprawnie mówimy „za ${CARD[remaining]} ${NOM[next]}”.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Którą z podanych godzin wskazuje zegar obok?</p><div class="clock-big">${clockFaceSVG(hour12,minute,170)}</div>`;
@@ -277,7 +289,7 @@ function genQ2(){
   const base = hour12+12;
   const options = shuffle([base-2,base-1,base,base+1].map(h=>({text:fmt(h,minute), correct:h===base})));
   return {
-    num:'Zadanie 2',
+    num:'Zadanie 2', topic:'Zegary',
     hint:`Jest wieczór, więc do godziny sprzed południa dodajemy 12: ${hour12} + 12 = ${base}. Zegar cyfrowy pokaże więc ${fmt(base,minute)}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Jest wieczór. Jak wyświetli się na zegarze cyfrowym godzina, którą wskazuje zegar obok?</p><div class="clock-big">${clockFaceSVG(hour12,minute,170)}</div>`;
@@ -302,7 +314,7 @@ function genQ3(){
   const ended = pastForm(act.g, 'skończył się', 'skończyła się');
   const lasted = pastForm(act.g, 'trwał', 'trwała');
   return {
-    num:'Zadanie 3',
+    num:'Zadanie 3', topic:'Kalendarz',
     hint:`Policz dni od ${d1} do ${d2} ${month} włącznie: ${list} — to ${dur} dni.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${act.name} ${started} ${d1} ${month} rano, a ${ended} ${d2} ${month} wieczorem. Ile dni ${lasted}?</p>`;
@@ -323,7 +335,7 @@ function genQ4(){
   const d2 = d1+diff;
   const options = shuffle([d2-1,d2,d2+1,d2+2].map(v=>({text:'na '+v+' '+month, correct:v===d2})));
   return {
-    num:'Zadanie 4',
+    num:'Zadanie 4', topic:'Kalendarz',
     hint:`Wypisz dni od ${DOW_GEN[startDow]} ${d1}: ${Array.from({length:diff+1},(_,i)=>`${DOW[(startDow+i)%7]} ${d1+i}`).join(', ')}. ${cap(najblizszy(targetDow))} po ${d1} ${month} to ${d2} ${month}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${person.n} ${pastForm(person.g,'miał','miała')} urodziny ${DOW_W[startDow]} ${d1} ${month}. Gości ${pastForm(person.g,'zaprosił','zaprosiła')} na ${najblizszy(targetDow)} po tym dniu. Na który dzień ${person.n} ${pastForm(person.g,'zaprosił','zaprosiła')} gości?</p>`;
@@ -340,7 +352,7 @@ function genQ5(){
   const distractors = sampleDistinct([...new Set(candidates)],3);
   const options = shuffle([{text:String(n),correct:true}, ...distractors.map(v=>({text:String(v),correct:false}))]);
   return {
-    num:'Zadanie 5',
+    num:'Zadanie 5', topic:'Cyfry rzymskie',
     hint:romanBreakdownHint(n,roman),
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Jak zapisać liczbę <strong>${roman}</strong> cyframi arabskimi?</p>`;
@@ -364,7 +376,7 @@ function genQ6(){
   const distractors = sampleDistinct(others,3).map(f=>f.a);
   const options = shuffle([{text:fact.a,correct:true}, ...distractors.map(a=>({text:a,correct:false}))]);
   return {
-    num:'Zadanie 6',
+    num:'Zadanie 6', topic:'Kalendarz',
     hint:`${fact.q.replace('Co jest ','').replace('?','')} to ${fact.a}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${fact.q}</p>`;
@@ -390,7 +402,7 @@ function genQ7(){
   const distractors = sampleDistinct([...new Set(cand)],3);
   const options = shuffle([{text:correctRoman,correct:true}, ...distractors.map(c=>({text:toRoman(c),correct:false}))]);
   return {
-    num:'Zadanie 7',
+    num:'Zadanie 7', topic:'Cyfry rzymskie',
     hint:`Wiek ${correctRoman} obejmuje lata od ${(century-1)*100+1} do ${century*100}, a rok ${ev.year} mieści się w tym przedziale.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${ev.text} Który to był wiek?</p>`;
@@ -416,7 +428,7 @@ function genQ8(){
     {text:d2+' m', correct:false},
   ]);
   return {
-    num:'Zadanie 8',
+    num:'Zadanie 8', topic:'Długości',
     hint:`Jedno piętro ma zwykle około 3,5 metra wysokości, więc budynek z ${floors} piętrami może mieć w przybliżeniu ${floors}×3,5 ≈ ${base} metrów. ${base} cm to za mało (to wysokość np. stołka), a ${d1}-${d2} m to wysokość dużo wyższego wieżowca — ponad dwa razy wyższego niż ten z ${floors} pięter.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${person.n} mieszka w ${floors}-piętrowym wieżowcu. Jaką wysokość może mieć taki budynek?</p>`;
@@ -435,7 +447,7 @@ function genQ9(){
   const fact = choice(FACTS9);
   const options = shuffle([{text:fact.a,correct:true}, ...fact.wrong.map(w=>({text:w,correct:false}))]);
   return {
-    num:'Zadanie 9',
+    num:'Zadanie 9', topic:'Długości',
     hint:`To duża odległość w skali kraju, więc musi być wyrażona w kilometrach, a liczba musi być odpowiednio duża — mniejsze jednostki (m) lub dużo mniejsze liczby km to za mało, żeby to sobie wyobrazić w skali Polski.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${fact.q}</p>`;
@@ -454,7 +466,7 @@ function genQ10(){
     ? `Jest wieczór, więc do godziny sprzed południa dodajemy 12: ${hour12} + 12 = ${correctH}. Zegar cyfrowy pokazałby ${correctText}.`
     : `Rano (przed południem) zegar cyfrowy pokazuje tę samą godzinę co zwykły zegar: ${correctText}.`;
   return {
-    num:'Zadanie 10',
+    num:'Zadanie 10', topic:'Zegary',
     hint,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Jest ${period}. Spójrz na zegar obok. Zapisz wskazaną przez niego godzinę tak, jak wyświetliłby ją zegar cyfrowy (format GG:MM).</p><div class="clock-big">${clockFaceSVG(hour12,minute,170)}</div>`;
@@ -478,7 +490,7 @@ function genQ11(){
     hintText = `Podziel obliczenia na dwa etapy: od ${fmt(startH,startM)} do pełnej godziny ${fmt(startH+1,0)} mija ${toFullHour} min, a od ${fmt(startH+1,0)} do ${fmt(endH,endM)} mija ${endM} min. Razem: ${toFullHour} + ${endM} = ${elapsed} min.`;
   }
   return {
-    num:'Zadanie 11',
+    num:'Zadanie 11', topic:'Zegary',
     hint:hintText,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Zegar na rysunku obok wskazuje godzinę, o której ${person.n} ${pastForm(person.g,'dotarł','dotarła')} wieczorem na przystanek. ${pastForm(person.g,'Jego','Jej')} autobus przyjedzie o ${fmt(endH,endM)}. Ile minut ${person.n} będzie czekać na ten autobus?</p><div class="clock-big">${clockFaceSVG(startH,startM,170)}</div>`;
@@ -506,7 +518,7 @@ function genQ12(){
   const afterPrepTotal = eventH*60+eventM-prep;
   const afterPrepH = Math.floor(afterPrepTotal/60), afterPrepM = afterPrepTotal%60;
   return {
-    num:'Zadanie 12',
+    num:'Zadanie 12', topic:'Zegary',
     hint:`Zajęcia zaczynają się o ${fmt(eventH,eventM)}, a trzeba przyjść ${prep} minut wcześniej: ${fmt(eventH,eventM)} − ${prep} min = ${fmt(afterPrepH,afterPrepM)}. Dojście zajmuje ${walk} minut, więc z domu trzeba wyjść o ${fmt(afterPrepH,afterPrepM)} − ${walk} min = ${correct}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${person.n} chodzi na ${act.name} piechotą. Zajmuje ${pastForm(person.g,'mu','jej')} to ${walk} minut. O której godzinie ${person.n} musi wychodzić z domu?</p>
@@ -530,7 +542,7 @@ function buildQ13Group(){
   const bank = shuffle([phraseA,phraseB,phraseC,decoy1,decoy2]);
   function makePart(letter, timeText, correctPhrase, hintText){
     return {
-      num:`Zadanie 13${letter}`,
+      num:`Zadanie 13${letter}`, topic:'Zegary',
       hint:hintText,
       render(container,onAnswer){
         container.innerHTML = `<p class="q-instruction">Dopasuj określenie z ramki do podanej godziny: <strong>${timeText}</strong></p>
@@ -558,7 +570,7 @@ function genQ14(){
   const yearNote = mi===11 ? ' następnego roku' : '';
   const options = shuffle(sampleDistinct(DOW.map((_,i)=>i),3,targetDow).map(i=>DOW[i]).concat([DOW[targetDow]]).map(t=>({text:cap(t), correct:t===DOW[targetDow]})));
   return {
-    num:'Zadanie 14',
+    num:'Zadanie 14', topic:'Kalendarz',
     hint:`${cap(MONTHS[mi])} ma ${daysInMonth} dni. ${daysInMonth} podzielone przez 7 daje ${Math.floor(daysInMonth/7)} reszty ${shift} (${Math.floor(daysInMonth/7)}×7=${Math.floor(daysInMonth/7)*7}, ${daysInMonth}-${Math.floor(daysInMonth/7)*7}=${shift}). Dzień tygodnia przesuwa się więc o ${shift} do przodu: ${DOW[startDow]} + ${shift} dni = ${DOW[targetDow]}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">W pewnym roku 1 ${MONTHS_GEN[mi]} był ${DOW_W[startDow]}. W jakim dniu tygodnia będzie 1 ${MONTHS_GEN[nextMi]}${yearNote}?</p>`;
@@ -575,7 +587,7 @@ function genQ15(){
   const b = randInt(1, Math.min(10, a-1));
   const correct = toRoman(a-b);
   return {
-    num:'Zadanie 15',
+    num:'Zadanie 15', topic:'Cyfry rzymskie',
     hint:`Zamień na liczby arabskie: ${toRoman(a)} = ${a}, ${toRoman(b)} = ${b}. Odejmij: ${a} − ${b} = ${a-b}. Zapisz wynik cyframi rzymskimi: ${a-b} = ${correct}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Spójrz na rozmowę sprzedawcy z klientem. Jaka będzie cena po obniżce? Zapisz ją cyframi rzymskimi.</p>
@@ -590,7 +602,7 @@ function genQ16a(){
   const a = randInt(1,30), b = randInt(1,39-a);
   const sum = a+b, correct = toRoman(sum);
   return {
-    num:'Zadanie 16a',
+    num:'Zadanie 16a', topic:'Cyfry rzymskie',
     hint:`Zamień na liczby arabskie: ${toRoman(a)} = ${a}, ${toRoman(b)} = ${b}. Dodaj: ${a} + ${b} = ${sum}. Zapisz wynik cyframi rzymskimi: ${sum} = ${correct}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Wykonaj działanie. Zapisz wynik za pomocą cyfr rzymskich:</p><p class="q-context" style="text-align:center;font-size:1.2rem;font-weight:700;">${toRoman(a)} + ${toRoman(b)}</p>`;
@@ -602,7 +614,7 @@ function genQ16b(){
   const a = randInt(10,35), b = randInt(1,a-1);
   const diff = a-b, correct = toRoman(diff);
   return {
-    num:'Zadanie 16b',
+    num:'Zadanie 16b', topic:'Cyfry rzymskie',
     hint:`Zamień na liczby arabskie: ${toRoman(a)} = ${a}, ${toRoman(b)} = ${b}. Odejmij: ${a} − ${b} = ${diff}. Zapisz wynik cyframi rzymskimi: ${diff} = ${correct}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Wykonaj działanie. Zapisz wynik za pomocą cyfr rzymskich:</p><p class="q-context" style="text-align:center;font-size:1.2rem;font-weight:700;">${toRoman(a)} − ${toRoman(b)}</p>`;
@@ -631,7 +643,7 @@ function genQ17(){
     : item.unit==='cm' ? 'to niewielka długość (rzędu pojedynczych przedmiotów szkolnych)'
     : 'to długość rzędu metrów (element pomieszczenia lub duży przedmiot)';
   return {
-    num:'Zadanie 17',
+    num:'Zadanie 17', topic:'Długości',
     hint:`${cap(item.name)} zwykle mierzy się w jednostce, która pasuje do jej wielkości: ${item.unit} — bo ${reason}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${person.n} ${pastForm(person.g,'zapisał','zapisała')}, że ${item.name} to ${value}, ale ${pastForm(person.g,'zapomniał','zapomniała')} podać jednostkę. Jaka to była jednostka?</p>`;
@@ -667,15 +679,17 @@ const scoreTotal = document.getElementById('score-total');
 const qNumber = document.getElementById('q-number');
 const resultTitle = document.getElementById('result-title');
 const resultDesc = document.getElementById('result-desc');
+const resultBreakdown = document.getElementById('result-breakdown');
 
 const PRAISE = ['Świetnie! ✅','Brawo! 🎉','Dokładnie tak! 👍','Super! ⭐','Tak jest! 🙌'];
 
-const state = { questions:[], index:0, score:0 };
+const state = { questions:[], index:0, score:0, wrong:[] };
 
 function startQuiz(){
   state.questions = buildQuestionSet();
   state.index = 0;
   state.score = 0;
+  state.wrong = [];
   startScreen.hidden = true;
   resultScreen.hidden = true;
   quizScreen.hidden = false;
@@ -693,17 +707,23 @@ function showQuestion(){
   feedback.className = 'feedback';
   nextBtn.hidden = true;
   questionArea.innerHTML = '';
-  q.render(questionArea, (isCorrect)=>handleAnswer(isCorrect, q.hint));
+  q.render(questionArea, (isCorrect)=>handleAnswer(isCorrect, q));
 }
 
-function handleAnswer(isCorrect, hint){
+function handleAnswer(isCorrect, q){
   if(isCorrect){
     state.score++;
     scoreText.textContent = state.score;
     feedback.innerHTML = PRAISE[Math.floor(Math.random()*PRAISE.length)];
     feedback.className = 'feedback feedback-good';
   } else {
-    const hintHTML = hint ? `<div class="hint-box">💡 <strong>Wyjaśnienie:</strong> ${hint}</div>` : '';
+    const instrEl = questionArea.querySelector('.q-instruction');
+    state.wrong.push({
+      topic: q.topic,
+      instruction: instrEl ? instrEl.textContent : q.num,
+      hint: q.hint
+    });
+    const hintHTML = q.hint ? `<div class="hint-box">💡 <strong>Wyjaśnienie:</strong> ${q.hint}</div>` : '';
     feedback.innerHTML = `Niepoprawnie.${hintHTML}`;
     feedback.className = 'feedback feedback-bad';
   }
@@ -730,6 +750,30 @@ function showResults(){
   else if(state.score>=total*0.4) desc='Dobrze, jeszcze trochę ćwiczeń i będzie super! 💪';
   else desc='Ćwicz dalej — na pewno Ci pójdzie coraz lepiej! 📚';
   resultDesc.textContent = desc;
+
+  if(state.wrong.length===0){
+    resultBreakdown.innerHTML = '';
+    return;
+  }
+  const topicTotals = {};
+  state.questions.forEach(q=>{ topicTotals[q.topic] = (topicTotals[q.topic]||0)+1; });
+  const topicWrong = {};
+  state.wrong.forEach(w=>{ topicWrong[w.topic] = (topicWrong[w.topic]||0)+1; });
+  const topicRows = Object.keys(topicTotals)
+    .filter(t=>topicWrong[t])
+    .sort((a,b)=>topicWrong[b]-topicWrong[a])
+    .map(t=>`<div class="topic-row"><span>${t}</span><span><b>${topicWrong[t]}</b>/${topicTotals[t]} błędów</span></div>`)
+    .join('');
+  const detailRows = state.wrong.map(w=>`
+    <div class="miss-item">
+      <div class="miss-q"><span class="miss-topic">${w.topic}</span>${w.instruction}</div>
+      ${w.hint ? `<div class="miss-hint">💡 ${w.hint}</div>` : ''}
+    </div>`).join('');
+  resultBreakdown.innerHTML = `
+    <h3>Z czym były problemy</h3>
+    ${topicRows}
+    <details class="miss-details"><summary>Zobacz wszystkie pomyłki (${state.wrong.length})</summary>${detailRows}</details>
+  `;
 }
 
 document.getElementById('start-btn').onclick = startQuiz;
