@@ -131,6 +131,13 @@ const ACC = [null,'pierwszą','drugą','trzecią','czwartą','piątą','szóstą
 const CARD = {5:'pięć',7:'siedem',8:'osiem',9:'dziewięć',10:'dziesięć',11:'jedenaście',15:'piętnaście',20:'dwadzieścia',25:'dwadzieścia pięć'};
 const MINUTES = [0,5,10,15,20,25,30,35,40,45,50,55];
 const DOW = ['poniedziałek','wtorek','środa','czwartek','piątek','sobota','niedziela'];
+const DOW_GEN = ['poniedziałku','wtorku','środy','czwartku','piątku','soboty','niedzieli'];
+const DOW_ACC = ['poniedziałek','wtorek','środę','czwartek','piątek','sobotę','niedzielę'];
+const DOW_GENDER = ['m','m','f','m','m','f','f'];
+// "w"/"we" + accusative, for constructions like "był w poniedziałek" / "we wtorek"
+const DOW_W = DOW_ACC.map((d,i)=> (i===1?'we ':'w ')+d);
+function najblizszy(i){ return (DOW_GENDER[i]==='f'?'najbliższą ':'najbliższy ')+DOW_ACC[i]; }
+function kazdyDzien(i){ return (DOW_GENDER[i]==='f'?'Każda ':'Każdy ')+DOW[i]; }
 const MONTHS = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
 const MONTHS_GEN = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
 const DAYS_NORMAL = [31,28,31,30,31,30,31,31,30,31,30,31];
@@ -280,18 +287,25 @@ function genQ2(){
 }
 
 // 3: ile dni trwała wycieczka
+const ACTIVITIES3 = [
+  {name:'Wycieczka', g:'f'}, {name:'Kolonia', g:'f'},
+  {name:'Wyprawa rowerowa', g:'f'}, {name:'Obóz sportowy', g:'m'}
+];
 function genQ3(){
-  const ACT = choice(['Wycieczka','Kolonia','Wyprawa rowerowa','Obóz sportowy']);
+  const act = choice(ACTIVITIES3);
   const month = choice(MONTHS_GEN);
   const dur = randInt(3,9);
   const d1 = randInt(2,18), d2 = d1+dur-1;
   const options = shuffle([dur-2,dur-1,dur,dur+1].filter(v=>v>0).map(v=>({text:v+' dni', correct:v===dur})));
   const list = Array.from({length:dur},(_,i)=>d1+i).join(', ');
+  const started = pastForm(act.g, 'zaczął się', 'zaczęła się');
+  const ended = pastForm(act.g, 'skończył się', 'skończyła się');
+  const lasted = pastForm(act.g, 'trwał', 'trwała');
   return {
     num:'Zadanie 3',
     hint:`Policz dni od ${d1} do ${d2} ${month} włącznie: ${list} — to ${dur} dni.`,
     render(container,onAnswer){
-      container.innerHTML = `<p class="q-instruction">${ACT} zaczęła się ${d1} ${month} rano, a skończyła ${d2} ${month} wieczorem. Ile dni trwała?</p>`;
+      container.innerHTML = `<p class="q-instruction">${act.name} ${started} ${d1} ${month} rano, a ${ended} ${d2} ${month} wieczorem. Ile dni ${lasted}?</p>`;
       renderTextOptions(container, options, onAnswer);
     }
   };
@@ -310,9 +324,9 @@ function genQ4(){
   const options = shuffle([d2-1,d2,d2+1,d2+2].map(v=>({text:'na '+v+' '+month, correct:v===d2})));
   return {
     num:'Zadanie 4',
-    hint:`Wypisz dni od ${DOW[startDow]} ${d1}: ${Array.from({length:diff+1},(_,i)=>`${DOW[(startDow+i)%7]} ${d1+i}`).join(', ')}. Najbliższy ${DOW[targetDow]} po ${d1} ${month} to ${d2} ${month}.`,
+    hint:`Wypisz dni od ${DOW_GEN[startDow]} ${d1}: ${Array.from({length:diff+1},(_,i)=>`${DOW[(startDow+i)%7]} ${d1+i}`).join(', ')}. ${cap(najblizszy(targetDow))} po ${d1} ${month} to ${d2} ${month}.`,
     render(container,onAnswer){
-      container.innerHTML = `<p class="q-instruction">${person.n} ${pastForm(person.g,'miał','miała')} urodziny w ${DOW[startDow]} ${d1} ${month}. Gości ${pastForm(person.g,'zaprosił','zaprosiła')} na najbliższy ${DOW[targetDow]} po tym dniu. Na który dzień ${person.n} ${pastForm(person.g,'zaprosił','zaprosiła')} gości?</p>`;
+      container.innerHTML = `<p class="q-instruction">${person.n} ${pastForm(person.g,'miał','miała')} urodziny ${DOW_W[startDow]} ${d1} ${month}. Gości ${pastForm(person.g,'zaprosił','zaprosiła')} na ${najblizszy(targetDow)} po tym dniu. Na który dzień ${person.n} ${pastForm(person.g,'zaprosił','zaprosiła')} gości?</p>`;
       renderTextOptions(container, options, onAnswer);
     }
   };
@@ -444,7 +458,7 @@ function genQ10(){
     hint,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">Jest ${period}. Spójrz na zegar obok. Zapisz wskazaną przez niego godzinę tak, jak wyświetliłby ją zegar cyfrowy (format GG:MM).</p><div class="clock-big">${clockFaceSVG(hour12,minute,170)}</div>`;
-      renderTextInput(container, correctText, onAnswer, 'np. '+correctText);
+      renderTextInput(container, correctText, onAnswer, 'np. 13:45');
     }
   };
 }
@@ -475,8 +489,10 @@ function genQ11(){
 
 // 12: o której trzeba wyjść z domu (odejmowanie dwóch odcinków czasu)
 const ACTIVITIES12 = [
-  {name:'judo', day:'wtorek'}, {name:'piłkę nożną', day:'czwartek'},
-  {name:'taniec', day:'środę'}, {name:'pływanie', day:'poniedziałek'}
+  {name:'judo', nameNom:'judo', dayIdx:1},
+  {name:'piłkę nożną', nameNom:'piłka nożna', dayIdx:3},
+  {name:'taniec', nameNom:'taniec', dayIdx:2},
+  {name:'pływanie', nameNom:'pływanie', dayIdx:0}
 ];
 function genQ12(){
   const person = choice(NAMES);
@@ -494,7 +510,7 @@ function genQ12(){
     hint:`Zajęcia zaczynają się o ${fmt(eventH,eventM)}, a trzeba przyjść ${prep} minut wcześniej: ${fmt(eventH,eventM)} − ${prep} min = ${fmt(afterPrepH,afterPrepM)}. Dojście zajmuje ${walk} minut, więc z domu trzeba wyjść o ${fmt(afterPrepH,afterPrepM)} − ${walk} min = ${correct}.`,
     render(container,onAnswer){
       container.innerHTML = `<p class="q-instruction">${person.n} chodzi na ${act.name} piechotą. Zajmuje ${pastForm(person.g,'mu','jej')} to ${walk} minut. O której godzinie ${person.n} musi wychodzić z domu?</p>
-        <div class="info-box"><b>ZAJĘCIA — ${act.name.toUpperCase()}</b><br>Każdy ${act.day}, godz. ${fmt(eventH,eventM)}<br>Przychodzimy ${prep} minut wcześniej, żeby się przygotować.</div>`;
+        <div class="info-box"><b>ZAJĘCIA — ${act.nameNom.toUpperCase()}</b><br>${kazdyDzien(act.dayIdx)}, godz. ${fmt(eventH,eventM)}<br>Przychodzimy ${prep} minut wcześniej, żeby się przygotować.</div>`;
       renderTextInput(container, correct, onAnswer, 'np. 17:25');
     }
   };
@@ -545,7 +561,7 @@ function genQ14(){
     num:'Zadanie 14',
     hint:`${cap(MONTHS[mi])} ma ${daysInMonth} dni. ${daysInMonth} podzielone przez 7 daje ${Math.floor(daysInMonth/7)} reszty ${shift} (${Math.floor(daysInMonth/7)}×7=${Math.floor(daysInMonth/7)*7}, ${daysInMonth}-${Math.floor(daysInMonth/7)*7}=${shift}). Dzień tygodnia przesuwa się więc o ${shift} do przodu: ${DOW[startDow]} + ${shift} dni = ${DOW[targetDow]}.`,
     render(container,onAnswer){
-      container.innerHTML = `<p class="q-instruction">W pewnym roku 1 ${MONTHS_GEN[mi]} był w ${DOW[startDow]}. W jakim dniu tygodnia będzie 1 ${MONTHS_GEN[nextMi]}${yearNote}?</p>`;
+      container.innerHTML = `<p class="q-instruction">W pewnym roku 1 ${MONTHS_GEN[mi]} był ${DOW_W[startDow]}. W jakim dniu tygodnia będzie 1 ${MONTHS_GEN[nextMi]}${yearNote}?</p>`;
       renderTextOptions(container, options, onAnswer);
     }
   };
@@ -618,7 +634,7 @@ function genQ17(){
     num:'Zadanie 17',
     hint:`${cap(item.name)} zwykle mierzy się w jednostce, która pasuje do jej wielkości: ${item.unit} — bo ${reason}.`,
     render(container,onAnswer){
-      container.innerHTML = `<p class="q-instruction">${person.n} zapisał(a), że ${item.name} to ${value}, ale zapomniał(a) podać jednostkę. Jaka to była jednostka?</p>`;
+      container.innerHTML = `<p class="q-instruction">${person.n} ${pastForm(person.g,'zapisał','zapisała')}, że ${item.name} to ${value}, ale ${pastForm(person.g,'zapomniał','zapomniała')} podać jednostkę. Jaka to była jednostka?</p>`;
       renderTextOptions(container, options, onAnswer);
     }
   };
